@@ -185,7 +185,7 @@ def bakeWindowsUV(operator, context):
 
             subdiv = math.ceil(n ** 0.5)
             cell_padding = 0.02
-            subcell_padding=0.05
+            subcell_padding = 0.05
             scale_uv = 0.2
             
             subcell_size = scale_uv / subdiv * (1 - cell_padding)
@@ -221,19 +221,25 @@ def bakeWindowsUV(operator, context):
                 scale_x = max_x - min_x
                 scale_y = max_y - min_y
 
-                row = idx // subdiv
-                col = idx % subdiv
-                offset_u = cell_offset_u + col * subcell_size
-                offset_v = cell_offset_v + row * subcell_size
+                # 🔹 Mantieni il rapporto d’aspetto
+                if scale_x > scale_y:
+                    aspect = scale_y / scale_x if scale_x != 0 else 1
+                    eff_x = effective_subcell_size
+                    eff_y = effective_subcell_size * aspect
+                else:
+                    aspect = scale_x / scale_y if scale_y != 0 else 1
+                    eff_x = effective_subcell_size * aspect
+                    eff_y = effective_subcell_size
 
                 for j, v in enumerate(verts_2d):
                     loop_index = face.loop_start + j
                     u = (v.x - min_x) / scale_x if scale_x != 0 else 0
                     v_coord = (v.y - min_y) / scale_y if scale_y != 0 else 0
                     uv_layer_data[loop_index].uv = (
-                        sub_offset_u + u * effective_subcell_size,
-                        sub_offset_v + v_coord * effective_subcell_size
+                        sub_offset_u + u * eff_x,
+                        sub_offset_v + v_coord * eff_y
                     )
+
 
 # === MAIN ===
 def main():
