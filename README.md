@@ -31,5 +31,6 @@ This script for automates the separation and export of 3D models based on **Vert
 ## III: Baking windows UV Map
 1. Make sure your 3D model has windows assigned to a Vertex Group called **Win**;
 2. Select the object in **OBJECT MODE**;
-3. Click *Bake Windows UV* on the UI;
-4. *Voilà!*
+3. Use the sliders to select the range of brightness of the windows (0 for always be on, 24 for always be off);
+4. Click *Bake Windows UV* on the UI;
+5. *Voilà!*
