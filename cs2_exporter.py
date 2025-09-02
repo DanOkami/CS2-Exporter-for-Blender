@@ -178,8 +178,8 @@ def bakeWindowsUV(operator, context):
     if min_val > max_val:
         min_val, max_val = max_val, min_val
 
-    min_cell_index = min_val - 1
-    max_cell_index = max_val - 1
+    min_cell_index = min_val
+    max_cell_index = max_val
 
     for poly in selected_polygons:
         cell_index = random.randint(min_cell_index, max_cell_index)
@@ -314,17 +314,17 @@ class OBJECT_OT_cs2_exporter_experimental(bpy.types.Operator):
 bpy.types.Scene.cs2_grid_range_min = bpy.props.IntProperty(
     name="Brightest Room",
     description="Range of lights",
-    default=1,
-    min=1,
-    max=25
+    default=0,
+    min=0,
+    max=24
 )
 
 bpy.types.Scene.cs2_grid_range_max = bpy.props.IntProperty(
     name="Darkest Room",
     description="Range of lights",
-    default=25,
-    min=1,
-    max=25
+    default=24,
+    min=0,
+    max=24
 )
 
 class OBJECT_OT_cs2_bake_windows_uv(bpy.types.Operator):
