@@ -171,9 +171,22 @@ def bakeWindowsUV(operator, context):
     
     UV_grid = [[[] for _ in range(5)] for _ in range(5)]
     
+    scene = bpy.context.scene
+    min_val = scene.cs2_grid_range_min
+    max_val = scene.cs2_grid_range_max
+
+    if min_val > max_val:
+        min_val, max_val = max_val, min_val
+
+    min_cell_index = min_val - 1
+    max_cell_index = max_val - 1
+
     for poly in selected_polygons:
-        r = random.randint(0, 4)
-        c = random.randint(0, 4)
+        cell_index = random.randint(min_cell_index, max_cell_index)
+
+        c = cell_index % 5
+        r = 4 - (cell_index // 5) 
+
         UV_grid[r][c].append(poly)
 
     for r in range(5):
@@ -299,7 +312,7 @@ class OBJECT_OT_cs2_exporter_experimental(bpy.types.Operator):
 
 # == WINDOWS UV BAKE ==
 bpy.types.Scene.cs2_grid_range_min = bpy.props.IntProperty(
-    name="Min Range",
+    name="Brightest Room",
     description="Range of lights",
     default=1,
     min=1,
@@ -307,7 +320,7 @@ bpy.types.Scene.cs2_grid_range_min = bpy.props.IntProperty(
 )
 
 bpy.types.Scene.cs2_grid_range_max = bpy.props.IntProperty(
-    name="Max Range",
+    name="Darkest Room",
     description="Range of lights",
     default=25,
     min=1,
@@ -339,6 +352,8 @@ class OBJECT_PT_simple_panel(bpy.types.Panel):
         layout.prop(scene, "cs2_use_reset_origin", toggle=True)
         
         layout.label(text="Windows settings")
+        layout.prop(scene, "cs2_grid_range_min", slider=True)
+        layout.prop(scene, "cs2_grid_range_max", slider=True)
         layout.operator("object.cs2_bake_windows_uv")
 
 def register():
