@@ -24,7 +24,7 @@ This script for automates the separation and export of 3D models based on **Vert
 
 ## II: FBX Model Export
 1. Select the main object you want to export;
-2. Make sure the Vertex Group names are valid according to the Cities: Skylines II modding guide (Win, Wim, Gls, Gra);
+2. Make sure the Vertex Group names are valid according to the Cities: Skylines II modding guide (Win, Wim, Gls, Gra), you can find everything you need for the 3D model in the official guide (https://cs2.paradoxwikis.com/Asset_Pipeline:_Buildings);
 3. Run the script from the "CS2 Exporter" panel on the right side of the 3D View;
 4. Exported `.fbx` files will appear in a folder inside the directory of your Blender project.
 
