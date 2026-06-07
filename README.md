@@ -36,7 +36,7 @@ Gone are the days of manual exports, tedious UV adjustments for windows, and rep
 ### Module 1: Export 3D Model (FBX)
 
 <p align="center">
-    <img src="images/export_panel.jpg" alt="CS2 Modding Suite HUD"/>
+    <img src="images/export_panel.jpg" alt="3D Model Export Module"/>
 </p>
 
 Even though the Cities: Skylines II editor is improving and asset importing will get easier, this automatic FBX exporting script remains incredibly useful for Blender artists.
@@ -78,6 +78,11 @@ Once your 3D model is prepared with the appropriate Vertex Groups or Materials, 
 ---
 
 ### Module 2: Bake Windows UV Map
+
+<p align="center">
+    <img src="images/windows_uv_panel.jpg" alt="Windows UV Map Module"/>
+</p>
+
 Cities: Skylines II uses a specific 5x5 UV grid for windows to determine when lights turn on at night.
 
 <p align="center">
@@ -94,6 +99,11 @@ Cities: Skylines II uses a specific 5x5 UV grid for windows to determine when li
 ---
 
 ### Module 3: Bake Material Atlas (Batch Baking)
+
+<p align="center">
+    <img src="images/atlas_panel.jpg" alt="Atlas Texture Baking Module"/>
+</p>
+
 This module saves hours of manual rendering when packing modular kits into a single Atlas. 
 The Atlas is extremely useful if you're creating a pack of different assets that share similar materials.
 
