@@ -2,7 +2,7 @@
 
 A complete, all-in-one Blender add-on designed to heavily automate the asset pipeline for **Cities: Skylines II**.
 
-Gone are the days of manual exports, tedious UV adjustments for windows, and repetitive material baking. This suite provides a unified HUD in the 3D Viewport to handle mesh separation, procedural Windows UV mapping, and Automated Batch Baking for Atlas textures.
+Gone are the days of manual exports, tedious UV adjustments for windows, and repetitive material baking. This suite provides a unified HUD in the 3D Viewport to handle mesh separation, procedural Windows UV mapping, Automated Material Setup, and Batch Baking for Atlas textures.
 
 <p align="center">
     <img src="images/panel.jpg" alt="CS2 Modding Suite HUD" style="height: 400px"/>
@@ -12,7 +12,7 @@ Gone are the days of manual exports, tedious UV adjustments for windows, and rep
 
 * **Smart FBX Exporter:** Duplicates your mesh, centers the origin, scales it perfectly for CS2, and automatically separates it into multiple `.fbx` files. You can now choose to separate the mesh by **Vertex Groups** OR by **Material Slots**.
 * **Procedural Windows UV Grid:** Automatically maps the UVs of your windows to a 5x5 grid based on the CS2 day/night cycle logic. You control the brightness range!
-* **Automated Batch Baking:** A 1-click solution to bake your `_BaseColor`, `_Normal`, and `_MaskMap`. The script automatically swaps the material states, configures Cycles rendering settings (Diffuse/Normal), performs the bake, and resets everything safely.
+* **Automated Material Setup & Batch Baking:** A seamless solution to generate atlas textures. The script automatically creates the required empty images, builds the complex `BAKE_SWITCH` node tree for every material, and 1-click bakes your `_BaseColor`, `_Normal`, and `_MaskMap`.
 
 ## 📦 Requirements
 
@@ -98,16 +98,14 @@ Cities: Skylines II uses a specific 5x5 UV grid for windows to determine when li
 
 ---
 
-### Module 3: Bake Material Atlas (Batch Baking)
+### Module 3: Material & Texture Setup
 
 <p align="center">
-    <img src="images/atlas_panel.jpg" alt="Atlas Texture Baking Module"/>
+    <img src="images/material_setup_panel.jpg" alt="Material & Texture Setup Module"/>
 </p>
 
-This module saves hours of manual rendering when packing modular kits into a single Atlas. 
-The Atlas is extremely useful if you're creating a pack of different assets that share similar materials.
-
-To create it easily, just add a **Plane** to the scene and subdivide it to form a grid (2x2, 4x4, 8x8, etc.).
+Baking multiple materials into a single Atlas is extremely useful if you're creating a pack of different assets that share similar textures. 
+To create it easily, just add a **Plane** to the scene and subdivide it to form a grid (2x2, 4x4, 8x8, etc.). Assign your different materials to the faces of this plane.
 
 Here's an example of a simple 2x2 plane for our atlas:
 
@@ -115,33 +113,39 @@ Here's an example of a simple 2x2 plane for our atlas:
     <image src="images/atlas_plane.jpg" style="height: 250px" alt="Atlas Plane">
 </p>
 
-**⚠️ CRITICAL SETUP BEFORE BAKING:**
-Every material applied to the Atlas Plane needs to have three distinct `Image Texture` nodes. Make sure to create a blank texture for each of them.
+**The Magic of Auto-Setup:**
+In the past, you had to manually create empty textures and wire complex nodes (`RGB to BW` for Metallic, `Invert Color` for Roughness to Glossiness, and a custom Switch node) for *every single material*. **Now, the add-on does it all for you in one click!**
+
+1. Select your Atlas Plane in Object Mode.
+2. Type a **Prefix** for your textures (e.g., `MyAtlas`).
+3. Select the desired **Resolution** (e.g., 2048). Smaller textures hold less detail but have a lower GPU impact.
+4. Click **Setup Materials**.
+
+**What happens behind the scenes?**
+* The script generates three empty textures in memory (`Prefix_BaseColor`, `Prefix_Normal`, `Prefix_MaskMap`) with the correct color spaces.
+* It injects Image Texture nodes at the top of your Shader Editor.
+* It automatically builds the CS2 `BAKE_SWITCH` logic inside *all* the materials applied to your object, wiring Metallic and Roughness maps perfectly for the MaskMap generation.
+
+![Node Setup](images/node_setup.jpg) *(The node tree generated automatically by the script)*
+
+---
+
+### Module 4: Run Baker
 
 <p align="center">
-    <image src="images/texture_images.jpg" style="height: 250px" alt="Texture Images">
+    <img src="images/atlas_panel.jpg" alt="Run Baker Module"/>
 </p>
 
-The texture size should be 1024x1024, 2048x2048, 4096x4096, or a square of your choice. Smaller textures hold less detail but have a lower GPU impact compared to 4K/8K textures.
-The texture names must consist of the 3D model's name followed by the texture type.
+Once your materials are set up (via Module 3), you are ready to bake!
 
-For the `_MaskMap` automation to work, your material must use a Switch node to toggle between the Base Color and the pure RGB Control Mask.
-
-* Add the Switch node (Menu Switch node) in your Shader Editor.
-* Select it, press **`F2`**, and rename it exactly to: **`BAKE_SWITCH`**.
-* The script expects State 0 (A) to be your BaseColor/Normal, and State 1 (B) to be your pure RGB Mask.
-
-![Node Setup](images/node_setup.jpg)
-
-The `RGB to BW` node has to be connected to the *Metallic* texture map of your material.
-
-The `Invert Color` node must be connected to your *Roughness* texture map (Cities: Skylines II uses *Glossiness*, which is the exact inverse of *Roughness*).
-
-**How to Bake:**
-1. Create 3 empty images in the Blender Image Editor using the standard naming convention (e.g., `MyModel_BaseColor`, `MyModel_Normal`, `MyModel_MaskMap`).
-2. In the CS2 Suite panel, type the **Prefix** exactly as you named the images (e.g., `MyModel`).
-3. Select the Atlas Plane you want to bake.
-4. Check the boxes for the specific maps you want to generate. This is especially useful for saving time if you only need to fix and rebake a single map!
-5. Click **Run Batch Bake**. 
-6. Sit back! The script will force all materials to State A, configure Cycles for pure Diffuse baking (disabling lights/shadows), bake the Color, switch to Normal baking, swap the materials to State B, bake the MaskMap, and finally reset your materials safely to their original state. Note that **the Blue channel is not used by Cities: Skylines II**; the script automatically transfers its data into the Alpha channel (which the game uses for glossiness). The data is kept in the Blue channel purely to let you easily visualize the result in Blender.
-7. *Don't forget to save your generated images (`Alt + S`) in the Image Editor!*
+1. Select the Atlas Plane you want to bake.
+2. Check the boxes for the specific maps you want to generate (`Base`, `Normal`, `Mask`). *This is especially useful for saving time if you only need to fix and rebake a single map later!*
+3. Click **Bake Atlas**. 
+4. Sit back! The script will:
+   * Force all materials to State A (BaseColor).
+   * Configure Cycles for pure Diffuse baking (disabling lights/shadows) and bake the Color.
+   * Switch to Normal baking.
+   * Swap the materials to State B (MaskMap) and bake the Mask.
+   * **Channel Packing:** Note that the Blue channel is not used by CS2; the script automatically transfers its data into the Alpha channel (used for glossiness).
+   * Safely reset your materials to their original state.
+5. ⚠️ **CRITICAL:** *Don't forget to save your generated images (`Alt + S`) in the Blender Image Editor before closing the program!*
